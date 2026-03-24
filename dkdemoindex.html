@@ -384,18 +384,28 @@
 
         document.querySelectorAll('.play-btn').forEach(btn => {
             btn.onclick = () => {
-                const start = parseFloat(btn.dataset.start);
-                const end = parseFloat(btn.dataset.end);
-                masterAudio.currentTime = start;
-                masterAudio.play();
-                const checkTime = () => {
-                    if (masterAudio.currentTime >= end) {
-                        masterAudio.pause();
-                        masterAudio.removeEventListener('timeupdate', checkTime);
-                    }
-                };
-                masterAudio.addEventListener('timeupdate', checkTime);
-            };
+    const start = parseFloat(btn.dataset.start);
+    const end = parseFloat(btn.dataset.end);
+
+    const playSegment = () => {
+        masterAudio.currentTime = start;
+        masterAudio.play();
+
+        const checkTime = () => {
+            if (masterAudio.currentTime >= end) {
+                masterAudio.pause();
+                masterAudio.removeEventListener('timeupdate', checkTime);
+            }
+        };
+        masterAudio.addEventListener('timeupdate', checkTime);
+    };
+
+    if (masterAudio.readyState >= 1) {
+        playSegment();
+    } else {
+        masterAudio.addEventListener('loadedmetadata', playSegment, { once: true });
+    }
+};
         });
     }
 
